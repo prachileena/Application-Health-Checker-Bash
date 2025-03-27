@@ -25,9 +25,9 @@ while true; do
 
     top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}' → Extracts CPU usage.
 
-free | awk '/Mem/{printf("%.2f"), $3/$2*100}' → Extracts memory usage.
+  free | awk '/Mem/{printf("%.2f"), $3/$2*100}' → Extracts memory usage.
 
-df / | awk 'NR==2 {print $5}' | sed 's/%//' → Extracts disk usage percentage.
+   df / | awk 'NR==2 {print $5}' | sed 's/%//' → Extracts disk usage percentage.
 
 bash
 echo "CPU Usage: $CPU_USAGE% | Memory Usage: $MEMORY_USAGE% | Disk Usage: $DISK_USAGE%"

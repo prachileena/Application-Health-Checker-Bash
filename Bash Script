@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# System Health Monitoring Script
+CPU_THRESHOLD=80
+MEMORY_THRESHOLD=80
+DISK_THRESHOLD=80
+
+echo "Starting System Health Monitor..."
+
+while true; do
+    CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')
+    MEMORY_USAGE=$(free | awk '/Mem/{printf("%.2f"), $3/$2*100}')
+    DISK_USAGE=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
+    
+    echo "CPU Usage: $CPU_USAGE% | Memory Usage: $MEMORY_USAGE% | Disk Usage: $DISK_USAGE%"
+    
+    if (( $(echo "$CPU_USAGE > $CPU_THRESHOLD" | bc -l) )); then
+        echo "⚠️ ALERT: CPU usage exceeded threshold!"
+    fi
+    
+    if (( $(echo "$MEMORY_USAGE > $MEMORY_THRESHOLD" | bc -l) )); then
+        echo "⚠️ ALERT: Memory usage exceeded threshold!"
+    fi
+    
+    if (( DISK_USAGE > DISK_THRESHOLD )); then
+        echo "⚠️ ALERT: Disk usage exceeded threshold!"
+    fi
+    
+    sleep 5  # Check every 5 seconds
+done
+
+
+# Application Health Checker
+check_application() {
+    URL="$1"
+    RESPONSE=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
+    if [ "$RESPONSE" -eq 200 ]; then
+        echo "✅ Application is UP! Status Code: $RESPONSE"
+    else
+        echo "❌ Application is DOWN! Status Code: $RESPONSE"
+    fi
+}
+
+# Example usage of Application Health Checker
+# Replace 'http://your-application-url.com' with the actual application URL
+check_application "http://your-application-url.com"
